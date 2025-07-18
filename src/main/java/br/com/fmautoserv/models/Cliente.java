@@ -1,0 +1,30 @@
+package br.com.fmautoserv.models;
+
+import java.util.List;
+
+import jakarta.persistence.*;
+import lombok.*;
+
+@Entity
+@Table(name = "cliente")
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@EqualsAndHashCode(of = "idcliente")
+public class Cliente {
+
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Long idcliente;
+	private String nome;
+	private String telefone;
+	private String celular;
+	private String cpfcnpj;
+	private String endereco;
+	private String bairro;
+	private String cidade;
+	
+    @OneToMany(mappedBy = "cliente", cascade = CascadeType.ALL)
+    private List<Veiculo> veiculos;
+}
