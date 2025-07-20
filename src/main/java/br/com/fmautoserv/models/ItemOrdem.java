@@ -23,7 +23,7 @@ public class ItemOrdem {
     private float valorUnitario;
     private float valorTotal;
     
-    public void calcularValorTotal() {
+    public void calcularValorTotalItem() {
         this.valorTotal = this.quantidade * this.valorUnitario;
     }
 }
