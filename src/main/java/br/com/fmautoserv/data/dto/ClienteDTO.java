@@ -1,21 +1,22 @@
-package br.com.fmautoserv.models;
+package br.com.fmautoserv.data.dto;
 
+import java.io.Serializable;
 import java.util.List;
 
-import jakarta.persistence.*;
 import lombok.*;
 
-@Entity
-@Table(name = "cliente")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(of = "idcliente")
-public class Cliente {
+public class ClienteDTO implements Serializable{
 
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -5403195132279645777L;
+	
 	private Long idcliente;
 	private String nome;
 	private String telefone;
@@ -25,6 +26,5 @@ public class Cliente {
 	private String bairro;
 	private String cidade;
 	
-    @OneToMany(mappedBy = "cliente", cascade = CascadeType.ALL)
-    private List<Veiculo> veiculos;
+    private List<VeiculoDTO> veiculos;
 }

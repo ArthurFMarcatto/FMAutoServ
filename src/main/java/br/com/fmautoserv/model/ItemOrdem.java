@@ -1,4 +1,4 @@
-package br.com.fmautoserv.models;
+package br.com.fmautoserv.model;
 
 import jakarta.persistence.*;
 import lombok.*;
@@ -17,7 +17,7 @@ public class ItemOrdem {
 	
     @ManyToOne
     @JoinColumn(name = "idos")
-	private OrdemDeServico ordem;
+	private OrdemDeServico ordemDeServico;
     private String descricao;
     private int quantidade;
     private float valorUnitario;

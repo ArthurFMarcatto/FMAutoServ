@@ -1,4 +1,4 @@
-package br.com.fmautoserv.models;
+package br.com.fmautoserv.model;
 
 
 import jakarta.persistence.*;
