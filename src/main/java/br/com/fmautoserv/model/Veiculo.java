@@ -1,5 +1,6 @@
 package br.com.fmautoserv.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import jakarta.persistence.*;
 import lombok.*;
@@ -21,8 +22,9 @@ public class Veiculo {
 	private int ano;
 	private String cor;
 	private String placa;
-	
-    @ManyToOne
-    @JoinColumn(name = "idcliente")
-    private Cliente cliente;
+
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "idcliente", nullable = false)
+	@JsonIgnoreProperties("veiculos")
+	private Cliente cliente;
 }

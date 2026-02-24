@@ -10,6 +10,7 @@ import br.com.fmautoserv.data.dto.ClienteDTO;
 import br.com.fmautoserv.mapper.ObjectMapper;
 import br.com.fmautoserv.model.Cliente;
 import br.com.fmautoserv.services.ClienteService;
+import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/api/cliente")
@@ -33,7 +34,7 @@ public class ClienteController {
 	}
 	
 	@PostMapping(produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE}, consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
-    public ResponseEntity<ClienteDTO> createCliente(@RequestBody ClienteDTO clienteDTO) {
+    public ResponseEntity<ClienteDTO> createCliente( @Valid @RequestBody ClienteDTO clienteDTO) {
 		Cliente novoCliente = ObjectMapper.parseObject(clienteDTO, Cliente.class);
 		Cliente novoClienteSalvo = service.createCliente(novoCliente);
 		ClienteDTO clienteSalvoDTO = ObjectMapper.parseObject(novoClienteSalvo, ClienteDTO.class);
@@ -46,7 +47,4 @@ public class ClienteController {
         return ResponseEntity.noContent().build();
     }
 	
-	
-	
-
 }

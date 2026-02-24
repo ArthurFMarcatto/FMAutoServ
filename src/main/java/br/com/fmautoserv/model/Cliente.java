@@ -1,6 +1,9 @@
 package br.com.fmautoserv.model;
 
+import java.util.ArrayList;
 import java.util.List;
+
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import jakarta.persistence.*;
 import lombok.*;
@@ -24,9 +27,9 @@ public class Cliente {
 	private String endereco;
 	private String bairro;
 	private String cidade;
-	
-	/*
-	 * @OneToMany(mappedBy = "cliente", cascade = CascadeType.ALL) private
-	 * List<Veiculo> veiculos;
-	 */
+
+    @OneToMany(mappedBy = "cliente", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonIgnoreProperties("cliente")
+    private List<Veiculo> veiculos = new ArrayList<>();
+
 }
