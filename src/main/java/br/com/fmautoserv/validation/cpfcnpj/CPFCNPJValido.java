@@ -1,16 +1,16 @@
-package br.com.fmautoserv.validation.cpf;
+package br.com.fmautoserv.validation.cpfcnpj;
 
 import jakarta.validation.Constraint;
 import jakarta.validation.Payload;
 import java.lang.annotation.*;
 
 @Documented
-@Constraint(validatedBy = CPFValidator.class)
+@Constraint(validatedBy = CPFCNPJValidator.class)
 @Target({ ElementType.FIELD })
 @Retention(RetentionPolicy.RUNTIME)
-public @interface CPFValido {
+public @interface CPFCNPJValido {
 
-    String message() default "CPF inválido";
+    String message() default "CPF ou CNPJ inválido";
 
     Class<?>[] groups() default {};
 

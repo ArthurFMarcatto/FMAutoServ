@@ -3,7 +3,7 @@ package br.com.fmautoserv.data.dto;
 import java.io.Serializable;
 import java.util.List;
 
-import br.com.fmautoserv.validation.cpf.CPFValido;
+import br.com.fmautoserv.validation.cpfcnpj.CPFCNPJValido;
 import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 
@@ -23,8 +23,8 @@ public class ClienteDTO implements Serializable{
 	private String nome;
 	private String telefone;
 	private String celular;
-	@CPFValido
-	@NotBlank(message = "CPF é obrigatório")
+	@CPFCNPJValido
+	@NotBlank(message = "CPF/CNPJ é obrigatório")
 	private String cpfcnpj;
 	private String endereco;
 	private String bairro;
