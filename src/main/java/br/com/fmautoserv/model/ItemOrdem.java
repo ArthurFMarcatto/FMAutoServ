@@ -1,5 +1,7 @@
 package br.com.fmautoserv.model;
 
+import java.math.BigDecimal;
+
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -11,19 +13,21 @@ import lombok.*;
 @AllArgsConstructor
 @EqualsAndHashCode(of = "iditemordem")
 public class ItemOrdem {
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long iditemordem;
-	
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long iditemordem;
+
     @ManyToOne
     @JoinColumn(name = "idos")
-	private OrdemDeServico ordemDeServico;
+    private OrdemDeServico ordemDeServico;
+
     private String descricao;
     private int quantidade;
-    private float valorUnitario;
-    private float valorTotal;
-    
-    public void calcularValorTotalItem() {
-        this.valorTotal = this.quantidade * this.valorUnitario;
+    private BigDecimal valorUnitario;
+    private BigDecimal valorTotal;
+
+    public void atualizarValores() {
+        this.valorTotal = this.valorUnitario.multiply(BigDecimal.valueOf(this.quantidade));
     }
 }
