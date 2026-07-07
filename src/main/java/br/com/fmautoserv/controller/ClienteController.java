@@ -19,32 +19,53 @@ public class ClienteController {
 	@Autowired
 	private ClienteService service;
 
-	@GetMapping(produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
+	@GetMapping(produces = { MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE })
 	public ResponseEntity<List<ClienteDTO>> findAll() {
-	    List<Cliente> listaDeClientes = service.findAll();
-	    List<ClienteDTO> listaDeDTOs = ObjectMapper.parseListObjects(listaDeClientes, ClienteDTO.class);
-	    return ResponseEntity.ok(listaDeDTOs);
+		List<Cliente> listaDeClientes = service.findAll();
+		return ResponseEntity.ok(ObjectMapper.parseListObjects(listaDeClientes, ClienteDTO.class));
 	}
-	
-	@GetMapping(value = "/{id}", produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
-	public ResponseEntity<ClienteDTO> findById(@PathVariable("id") Long id){
+
+	@GetMapping(value = "/{id}", produces = { MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE })
+	public ResponseEntity<ClienteDTO> findById(@PathVariable Long id) {
 		Cliente cliente = service.findById(id);
-		ClienteDTO clienteDTO = ObjectMapper.parseObject(cliente, ClienteDTO.class);
-		return ResponseEntity.ok(clienteDTO);
+		return ResponseEntity.ok(ObjectMapper.parseObject(cliente, ClienteDTO.class));
 	}
-	
-	@PostMapping(produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE}, consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
-    public ResponseEntity<ClienteDTO> createCliente( @Valid @RequestBody ClienteDTO clienteDTO) {
-		Cliente novoCliente = ObjectMapper.parseObject(clienteDTO, Cliente.class);
-		Cliente novoClienteSalvo = service.createCliente(novoCliente);
-		ClienteDTO clienteSalvoDTO = ObjectMapper.parseObject(novoClienteSalvo, ClienteDTO.class);
-        return ResponseEntity.status(HttpStatus.CREATED).body(clienteSalvoDTO);
-    }
-	
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteCliente(@PathVariable("id") Long id) {
-        service.deleteCliente(id);
-        return ResponseEntity.noContent().build();
-    }
-	
+
+	@PostMapping(produces = { MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE }, consumes = {
+			MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE })
+	public ResponseEntity<ClienteDTO> createCliente(@Valid @RequestBody ClienteDTO clienteDTO) {
+		Cliente novoCliente = service.createCliente(ObjectMapper.parseObject(clienteDTO, Cliente.class));
+		return ResponseEntity.status(HttpStatus.CREATED).body(ObjectMapper.parseObject(novoCliente, ClienteDTO.class));
+	}
+
+	@PutMapping(value = "/{id}", produces = { MediaType.APPLICATION_JSON_VALUE,
+			MediaType.APPLICATION_XML_VALUE }, consumes = { MediaType.APPLICATION_JSON_VALUE,
+					MediaType.APPLICATION_XML_VALUE })
+	public ResponseEntity<ClienteDTO> updateCliente(@PathVariable Long id, @Valid @RequestBody ClienteDTO clienteDTO) {
+
+		Cliente cliente = ObjectMapper.parseObject(clienteDTO, Cliente.class);
+
+		Cliente clienteAtualizado = service.updateCliente(id, cliente);
+
+		return ResponseEntity.ok(ObjectMapper.parseObject(clienteAtualizado, ClienteDTO.class));
+	}
+
+	@PatchMapping(value = "/{id}", produces = { MediaType.APPLICATION_JSON_VALUE,
+			MediaType.APPLICATION_XML_VALUE }, consumes = { MediaType.APPLICATION_JSON_VALUE,
+					MediaType.APPLICATION_XML_VALUE })
+	public ResponseEntity<ClienteDTO> patchCliente(@PathVariable Long id, @RequestBody ClienteDTO clienteDTO) {
+
+		Cliente cliente = ObjectMapper.parseObject(clienteDTO, Cliente.class);
+
+		Cliente clienteAtualizado = service.updateCliente(id, cliente);
+
+		return ResponseEntity.ok(ObjectMapper.parseObject(clienteAtualizado, ClienteDTO.class));
+	}
+
+	@DeleteMapping("/{id}")
+	public ResponseEntity<Void> deleteCliente(@PathVariable Long id) {
+		service.deleteCliente(id);
+		return ResponseEntity.noContent().build();
+	}
+
 }

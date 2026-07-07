@@ -1,6 +1,7 @@
-package br.com.fmautoserv.services; // Exemplo de pacote para o serviço
+package br.com.fmautoserv.services;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.logging.Logger;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,18 +34,20 @@ public class ClienteService {
 		return repository.save(cliente);
 	}
 
-	public Cliente updateCliente(Cliente cliente) {
-		logger.info("Atualizando Clientes");
-		Cliente entity = repository.findById(cliente.getIdcliente()).orElseThrow(() -> new ResourceNotFoundException(
-				"Cliente com ID " + cliente.getIdcliente() + " não encontrado para atualização!"));
+	public Cliente updateCliente(Long id, Cliente cliente) {
 
-		entity.setNome(cliente.getNome());
-		entity.setTelefone(cliente.getTelefone());
-		entity.setCelular(cliente.getCelular());
-		entity.setCpfcnpj(cliente.getCpfcnpj());
-		entity.setEndereco(cliente.getEndereco());
-		entity.setBairro(cliente.getBairro());
-		entity.setCidade(cliente.getCidade());
+		logger.info("Atualizando Cliente com ID: " + id);
+
+		Cliente entity = repository.findById(id)
+				.orElseThrow(() -> new ResourceNotFoundException("Cliente com ID " + id + " não encontrado!"));
+
+		Optional.ofNullable(cliente.getNome()).ifPresent(entity::setNome);
+		Optional.ofNullable(cliente.getTelefone()).ifPresent(entity::setTelefone);
+		Optional.ofNullable(cliente.getCelular()).ifPresent(entity::setCelular);
+		Optional.ofNullable(cliente.getCpfcnpj()).ifPresent(entity::setCpfcnpj);
+		Optional.ofNullable(cliente.getEndereco()).ifPresent(entity::setEndereco);
+		Optional.ofNullable(cliente.getBairro()).ifPresent(entity::setBairro);
+		Optional.ofNullable(cliente.getCidade()).ifPresent(entity::setCidade);
 
 		return repository.save(entity);
 	}

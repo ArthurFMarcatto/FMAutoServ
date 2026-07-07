@@ -15,7 +15,7 @@ public class VeiculoDTO {
 	private Long idveiculo;
 	private String montadora;
 	private String modelo;
-	private int ano;
+	private Integer ano;
 	private String cor;
 	@NotBlank(message = "Placa é obrigatória")
 	@Pattern(

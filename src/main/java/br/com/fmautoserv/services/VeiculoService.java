@@ -1,4 +1,4 @@
-package br.com.fmautoserv.services; // Exemplo de pacote para o serviço
+package br.com.fmautoserv.services;
 
 import java.util.List;
 import java.util.logging.Logger;
@@ -6,7 +6,6 @@ import java.util.logging.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import br.com.fmautoserv.data.dto.VeiculoDTO;
 import br.com.fmautoserv.exceptions.ResourceNotFoundException;
 import br.com.fmautoserv.model.Cliente;
 import br.com.fmautoserv.model.Veiculo;
@@ -34,10 +33,10 @@ public class VeiculoService {
 		return repository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Veiculo não encontrado!"));
 	}
 
-	public Veiculo createVeiculo(VeiculoDTO dto) {
+	public Veiculo createVeiculo(Veiculo dto) {
 		logger.info("Criando Novo Veiculo");
 
-		Cliente cliente = clienteRepository.findById(dto.getClienteId())
+		Cliente cliente = clienteRepository.findById(dto.getCliente().getIdcliente())
 				.orElseThrow(() -> new ResourceNotFoundException("Cliente não encontrado!"));
 
 		Veiculo veiculo = new Veiculo();
@@ -51,23 +50,41 @@ public class VeiculoService {
 		return repository.save(veiculo);
 	}
 
-	public Veiculo updateVeiculo(Long id, VeiculoDTO dto) {
-		logger.info("Atualizando Veiculo");
+	public Veiculo updateVeiculo(Long id, Veiculo dto) {
+	    logger.info("Atualizando Veiculo");
 
-		Veiculo entity = repository.findById(id)
-				.orElseThrow(() -> new ResourceNotFoundException("Veiculo não encontrado!"));
+	    Veiculo entity = repository.findById(id)
+	            .orElseThrow(() -> new ResourceNotFoundException("Veiculo não encontrado!"));
 
-		Cliente cliente = clienteRepository.findById(dto.getClienteId())
-				.orElseThrow(() -> new ResourceNotFoundException("Cliente não encontrado!"));
+	    if (dto.getMontadora() != null) {
+	        entity.setMontadora(dto.getMontadora());
+	    }
 
-		entity.setMontadora(dto.getMontadora());
-		entity.setModelo(dto.getModelo());
-		entity.setAno(dto.getAno());
-		entity.setCor(dto.getCor());
-		entity.setPlaca(dto.getPlaca());
-		entity.setCliente(cliente);
+	    if (dto.getModelo() != null) {
+	        entity.setModelo(dto.getModelo());
+	    }
 
-		return repository.save(entity);
+	    if (dto.getAno() != 0) {
+	        entity.setAno(dto.getAno());
+	    }
+
+	    if (dto.getCor() != null) {
+	        entity.setCor(dto.getCor());
+	    }
+
+	    if (dto.getPlaca() != null) {
+	        entity.setPlaca(dto.getPlaca());
+	    }
+
+	    if (dto.getCliente() != null && dto.getCliente().getIdcliente() != null) {
+
+	        Cliente cliente = clienteRepository.findById(dto.getCliente().getIdcliente())
+	                .orElseThrow(() -> new ResourceNotFoundException("Cliente não encontrado!"));
+
+	        entity.setCliente(cliente);
+	    }
+
+	    return repository.save(entity);
 	}
 
 	public void deleteVeiculo(Long id) {

@@ -7,6 +7,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -15,6 +16,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import br.com.fmautoserv.data.dto.VeiculoDTO;
+import br.com.fmautoserv.mapper.ObjectMapper;
+import br.com.fmautoserv.model.Cliente;
 import br.com.fmautoserv.model.Veiculo;
 import br.com.fmautoserv.services.VeiculoService;
 
@@ -28,52 +31,96 @@ public class VeiculoController {
 	@GetMapping
 	public ResponseEntity<List<VeiculoDTO>> findAll() {
 
-		List<VeiculoDTO> dtos = service.findAll().stream().map(this::convertToDTO).toList();
+		List<Veiculo> listaVeiculos = service.findAll();
+		List<VeiculoDTO> listaVeiculosDtos = ObjectMapper.parseListObjects(listaVeiculos, VeiculoDTO.class);
 
-		return ResponseEntity.ok(dtos);
+		listaVeiculosDtos.forEach(dto -> {
+			Veiculo v = listaVeiculos.stream().filter(veiculo -> veiculo.getIdveiculo().equals(dto.getIdveiculo()))
+					.findFirst().orElse(null);
+
+			if (v != null && v.getCliente() != null) {
+				dto.setClienteId(v.getCliente().getIdcliente());
+			}
+		});
+
+		return ResponseEntity.ok(listaVeiculosDtos);
 	}
 
 	@GetMapping("/{id}")
 	public ResponseEntity<VeiculoDTO> findById(@PathVariable Long id) {
 
 		Veiculo veiculo = service.findById(id);
+		VeiculoDTO veiculoDTO = ObjectMapper.parseObject(veiculo, VeiculoDTO.class);
 
-		return ResponseEntity.ok(convertToDTO(veiculo));
+		if (veiculo.getCliente() != null) {
+			veiculoDTO.setClienteId(veiculo.getCliente().getIdcliente());
+		}
+
+		return ResponseEntity.ok(veiculoDTO);
+
 	}
 
 	@PostMapping
 	public ResponseEntity<VeiculoDTO> create(@RequestBody VeiculoDTO dto) {
 
-		Veiculo veiculoSalvo = service.createVeiculo(dto);
+		Veiculo novoVeiculo = ObjectMapper.parseObject(dto, Veiculo.class);
 
-		return ResponseEntity.status(HttpStatus.CREATED).body(convertToDTO(veiculoSalvo));
+		Cliente cliente = new Cliente();
+		cliente.setIdcliente(dto.getClienteId());
+
+		novoVeiculo.setCliente(cliente);
+
+		Veiculo novoVeiculoSalvo = service.createVeiculo(novoVeiculo);
+
+		VeiculoDTO novoVeiculoSalvoDTO = ObjectMapper.parseObject(novoVeiculoSalvo, VeiculoDTO.class);
+		novoVeiculoSalvoDTO.setClienteId(novoVeiculoSalvo.getCliente().getIdcliente());
+
+		return ResponseEntity.status(HttpStatus.CREATED).body(novoVeiculoSalvoDTO);
 	}
 
 	@PutMapping("/{id}")
-	public ResponseEntity<VeiculoDTO> update(@PathVariable Long id, @RequestBody VeiculoDTO dto) {
+	public ResponseEntity<VeiculoDTO> updateCompleto(@PathVariable Long id, @RequestBody VeiculoDTO dto) {
 
-		Veiculo atualizado = service.updateVeiculo(id, dto);
+		Veiculo veiculo = ObjectMapper.parseObject(dto, Veiculo.class);
 
-		return ResponseEntity.ok(convertToDTO(atualizado));
+		if (dto.getClienteId() != null) {
+			Cliente cliente = new Cliente();
+			cliente.setIdcliente(dto.getClienteId());
+			veiculo.setCliente(cliente);
+		}
+		Veiculo atualizado = service.updateVeiculo(id, veiculo);
+
+		VeiculoDTO response = ObjectMapper.parseObject(atualizado, VeiculoDTO.class);
+		response.setClienteId(atualizado.getCliente().getIdcliente());
+
+		return ResponseEntity.ok(response);
+	}
+
+	@PatchMapping("/{id}")
+	public ResponseEntity<VeiculoDTO> updateParcial(@PathVariable Long id, @RequestBody VeiculoDTO dto) {
+
+		Veiculo veiculo = ObjectMapper.parseObject(dto, Veiculo.class);
+
+		if (dto.getClienteId() != null) {
+			Cliente cliente = new Cliente();
+			cliente.setIdcliente(dto.getClienteId());
+			veiculo.setCliente(cliente);
+		}
+
+		Veiculo atualizado = service.updateVeiculo(id, veiculo);
+
+		VeiculoDTO response = ObjectMapper.parseObject(atualizado, VeiculoDTO.class);
+
+		if (atualizado.getCliente() != null) {
+			response.setClienteId(atualizado.getCliente().getIdcliente());
+		}
+
+		return ResponseEntity.ok(response);
 	}
 
 	@DeleteMapping("/{id}")
 	public ResponseEntity<Void> delete(@PathVariable Long id) {
 		service.deleteVeiculo(id);
 		return ResponseEntity.noContent().build();
-	}
-
-	private VeiculoDTO convertToDTO(Veiculo veiculo) {
-
-		VeiculoDTO dto = new VeiculoDTO();
-		dto.setIdveiculo(veiculo.getIdveiculo());
-		dto.setMontadora(veiculo.getMontadora());
-		dto.setModelo(veiculo.getModelo());
-		dto.setAno(veiculo.getAno());
-		dto.setCor(veiculo.getCor());
-		dto.setPlaca(veiculo.getPlaca());
-		dto.setClienteId(veiculo.getCliente().getIdcliente());
-
-		return dto;
 	}
 }
