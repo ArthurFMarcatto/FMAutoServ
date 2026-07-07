@@ -24,4 +24,8 @@ public class Veiculo {
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "idcliente", nullable = false)
 	private Cliente cliente;
+	
+    public Long getClienteId() {
+        return this.cliente != null ? this.cliente.getIdcliente() : null;
+    }
 }
