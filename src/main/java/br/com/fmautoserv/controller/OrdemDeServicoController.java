@@ -49,6 +49,14 @@ public class OrdemDeServicoController {
 				.ok(ObjectMapper.parseObject(service.updateOrdemServico(id, dto), OrdemDeServicoDTO.class));
 	}
 
+	@PatchMapping(value = "/{id}", produces = { MediaType.APPLICATION_JSON_VALUE,
+			MediaType.APPLICATION_XML_VALUE }, consumes = { MediaType.APPLICATION_JSON_VALUE,
+					MediaType.APPLICATION_XML_VALUE })
+	public ResponseEntity<OrdemDeServicoDTO> patchOrdemServico(@PathVariable Long id,
+			@RequestBody OrdemDeServicoDTO dto) {
+		return ResponseEntity.ok(ObjectMapper.parseObject(service.patchOrdemServico(id, dto), OrdemDeServicoDTO.class));
+	}
+
 	@DeleteMapping("/{id}")
 	public ResponseEntity<Void> deleteOrdemDeServico(@PathVariable Long id) {
 		service.deleteOrdemDeServico(id);

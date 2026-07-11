@@ -1,6 +1,7 @@
-package br.com.fmautoserv.services; 
+package br.com.fmautoserv.services;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.logging.Logger;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -85,16 +86,62 @@ public class OrdemDeServicoService {
 					.orElseThrow(() -> new ResourceNotFoundException("Veículo não encontrado!"));
 			entity.setVeiculo(veiculo);
 		}
-		
+
 		if (dto.getItensOrdem() != null) {
-		    entity.getItensOrdem().clear();
-		    for (ItemOrdemDTO dtoItem : dto.getItensOrdem()) {
-		        ItemOrdem item = new ItemOrdem();
-		        item.setDescricao(dtoItem.getDescricao());
-		        item.setQuantidade(dtoItem.getQuantidade());
-		        item.setValorUnitario(dtoItem.getValorUnitario());
-		        entity.adicionarItem(item);
-		    }
+			entity.getItensOrdem().clear();
+			for (ItemOrdemDTO dtoItem : dto.getItensOrdem()) {
+				ItemOrdem item = new ItemOrdem();
+				item.setDescricao(dtoItem.getDescricao());
+				item.setQuantidade(dtoItem.getQuantidade());
+				item.setValorUnitario(dtoItem.getValorUnitario());
+				entity.adicionarItem(item);
+			}
+		}
+
+		return repository.save(entity);
+	}
+
+	@Transactional
+	public OrdemDeServico patchOrdemServico(Long id, OrdemDeServicoDTO dto) {
+		logger.info("Atualizando parcialmente Ordem de Serviço");
+
+		OrdemDeServico entity = repository.findByIdWithItens(id)
+				.orElseThrow(() -> new ResourceNotFoundException("Ordem de Serviço não encontrada!"));
+
+		if (dto.getClienteId() != null) {
+			Cliente cliente = clienteRepository.findById(dto.getClienteId())
+					.orElseThrow(() -> new ResourceNotFoundException("Cliente não encontrado!"));
+			entity.setCliente(cliente);
+		}
+
+		if (dto.getVeiculoId() != null) {
+			Veiculo veiculo = veiculoRepository.findById(dto.getVeiculoId())
+					.orElseThrow(() -> new ResourceNotFoundException("Veículo não encontrado!"));
+			entity.setVeiculo(veiculo);
+		}
+
+		if (dto.getItensOrdem() != null) {
+			for (ItemOrdemDTO dtoItem : dto.getItensOrdem()) {
+				if (dtoItem.getIditemordem() != null) {
+					entity.getItensOrdem().stream().filter(i -> i.getIditemordem().equals(dtoItem.getIditemordem()))
+							.findFirst().ifPresentOrElse(item -> {
+								Optional.ofNullable(dtoItem.getDescricao()).ifPresent(item::setDescricao);
+								if (dtoItem.getQuantidade() > 0)
+									item.setQuantidade(dtoItem.getQuantidade());
+								if (dtoItem.getValorUnitario() != null)
+									item.setValorUnitario(dtoItem.getValorUnitario());
+								item.atualizarValores();
+							}, () -> logger.warning(
+									"Item com id " + dtoItem.getIditemordem() + " não encontrado na ordem " + id));
+				} else {
+					ItemOrdem novoItem = new ItemOrdem();
+					novoItem.setDescricao(dtoItem.getDescricao());
+					novoItem.setQuantidade(dtoItem.getQuantidade());
+					novoItem.setValorUnitario(dtoItem.getValorUnitario());
+					entity.adicionarItem(novoItem);
+				}
+			}
+			entity.recalcularTotal();
 		}
 
 		return repository.save(entity);
